@@ -18,6 +18,7 @@ setup(
     include_package_data=True,
     description='Simple middleware for healthchecks',
     long_description=README,
+    long_description_content_type='text/markdown',
     url='https://github.com/rehive/rehive-django-healthcheck',
     download_url='https://github.com/rehive/rehive-django-healthcheck/archive/{}.zip'.format(VERSION),
     author='Rehive',
