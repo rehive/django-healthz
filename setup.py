@@ -19,6 +19,7 @@ setup(
     url='https://github.com/rehive/rehive-django-healthcheck',
     author='Rehive',
     author_email='info@rehive.com',
+    license='MIT',
     install_requires=["Django>=2.0"],
     python_requires='>=3.4',
     classifiers=[
@@ -26,6 +27,7 @@ setup(
         'Framework :: Django :: 2.2',
         'Intended Audience :: Developers',
         'Operating System :: OS Independent',
+        'License :: OSI Approved :: MIT License',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
