@@ -2,20 +2,26 @@
 
 ## Quick start
 
-1. Add "healthcheck" to your INSTALLED_APPS settings like this:
+1. Install the package:
+
+```
+pip install django-healthz
+```
+
+2. Add "healthz" to your INSTALLED_APPS settings like this:
 
 ```
     INSTALLED_APPS = [
         ...
-        'healthcheck',
+        'healthz',
     ]
 ```
 
-2. Include the healtheck middleware in the django middleware:
+3. Include the healtheck middleware in the django middleware:
 
 ```
 MIDDLEWARE = [
-    'healthcheck.middleware.HealthCheckMiddleware',
+    'healthz.middleware.HealthCheckMiddleware',
     ...
 ]
 ```

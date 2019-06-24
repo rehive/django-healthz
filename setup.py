@@ -3,7 +3,7 @@ from codecs import open
 from setuptools import find_packages, setup
 
 
-VERSION = '0.0.2'
+VERSION = '0.0.3'
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
@@ -12,15 +12,15 @@ with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
 os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
-    name='rehive-django-healthcheck',
+    name='django-healthz',
     version=VERSION,
     packages=find_packages(),
     include_package_data=True,
     description='Simple middleware for healthchecks',
     long_description=README,
     long_description_content_type='text/markdown',
-    url='https://github.com/rehive/rehive-django-healthcheck',
-    download_url='https://github.com/rehive/rehive-django-healthcheck/archive/{}.zip'.format(VERSION),
+    url='https://github.com/rehive/django-healthz',
+    download_url='https://github.com/rehive/django-healthz/archive/{}.zip'.format(VERSION),
     author='Rehive',
     author_email='info@rehive.com',
     license='MIT',
