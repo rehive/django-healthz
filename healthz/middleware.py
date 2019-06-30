@@ -1,5 +1,6 @@
 from django.utils.deprecation import MiddlewareMixin
-from django.http import HttpResponse, HttpResponseServerError
+from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotAllowed
+from django.conf import settings
 from logging import getLogger
 
 
@@ -7,12 +8,34 @@ logger = getLogger('django')
 
 
 class HealthCheckMiddleware(MiddlewareMixin):
+    readiness_checks = None
+
     def process_request(self, request):
-        if request.method == "GET":
-            if request.path == "/readiness":
-                return self.readiness(request)
-            elif request.path == "/healthz":
-                return self.healthz(request)
+        if request.method != "GET":
+            return HttpResponseNotAllowed()
+
+        if not self.is_settings_defined():
+            return HttpResponseServerError("DOWN")
+        self.readiness_checks = getattr(settings, 'HEALTHCHECK').get('READINESS_CHECKS', [])
+
+        if request.path == "/readiness":
+            return self.readiness(request)
+        elif request.path == "/healthz":
+            return self.healthz(request)
+
+    def is_settings_defined(self):
+        healthcheck = getattr(settings, 'HEALTHCHECK', None)
+        if not healthcheck:
+            logger.exception('HEALTHCHECK settings not defined')
+            return False
+        try:
+            if not healthcheck['READINESS_CHECKS']:
+                logger.exception('READINESS_CHECKS settings not defined')
+                return False
+        except KeyError:
+            logger.exception('READINESS_CHECKS settings not defined')
+            return False
+        return True
 
     def healthz(self, request):
         """
@@ -21,9 +44,14 @@ class HealthCheckMiddleware(MiddlewareMixin):
         return HttpResponse("OK")
 
     def readiness(self, request):
-        checks = [self.databases_ok(request),
-                  self.caches_ok(request),
-                  self.queues_ok(request)]
+        checks = []
+        for check in self.readiness_checks:
+            if check == 'databases':
+                checks.append(self.databases_ok(request))
+            if check == 'caches':
+                checks.append(self.caches_ok(request))
+            if check == 'queues':
+                checks.append(self.queues_ok(request))
         if not all(checks):
             return HttpResponseServerError("DOWN")
         return HttpResponse("OK")
