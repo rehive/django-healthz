@@ -11,9 +11,6 @@ class HealthCheckMiddleware(MiddlewareMixin):
     readiness_checks = []
 
     def process_request(self, request):
-        if request.method != "GET":
-            return HttpResponseNotAllowed(['GET'])
-
         healthcheck = getattr(settings, 'HEALTHCHECK', None)
         if healthcheck:
             self.readiness_checks = healthcheck.get('READINESS_CHECKS', [])
