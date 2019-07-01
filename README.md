@@ -26,8 +26,16 @@ MIDDLEWARE = [
 ]
 ```
 
+4. Configure the readiness checks:
+
+```
+HEALTHCHECK = {
+    'READINESS_CHECKS': ('databases', 'caches', 'queues',)
+}
+```
+
 ## TODO
 
-1. Add support for celery/rabbitmq, cache checks etc.
-2. Update responses to JSON
-3. Allow customization or readiness and healthz URLs.
+1. Update responses to JSON
+2. Allow customization or readiness and healthz URLs.
+
