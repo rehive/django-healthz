@@ -12,7 +12,7 @@ class HealthCheckMiddleware(MiddlewareMixin):
 
     def process_request(self, request):
         if request.method != "GET":
-            return HttpResponseNotAllowed()
+            return HttpResponseNotAllowed(['GET'])
 
         healthcheck = getattr(settings, 'HEALTHCHECK', None)
         if healthcheck:
