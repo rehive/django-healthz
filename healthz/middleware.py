@@ -1,7 +1,9 @@
-from django.utils.deprecation import MiddlewareMixin
-from django.http import HttpResponse, HttpResponseServerError, HttpResponseNotAllowed
-from django.conf import settings
+import copy
 from logging import getLogger
+
+from django.utils.deprecation import MiddlewareMixin
+from django.http import HttpResponse, HttpResponseServerError
+from django.conf import settings
 
 
 logger = getLogger('django')
@@ -65,6 +67,9 @@ class HealthCheckMiddleware(MiddlewareMixin):
             return True
 
     def caches_ok(self, request):
+        """
+        Check whether a redis cache is alive by pinging it.
+        """
         try:
             from django_redis import get_redis_connection
             from redis.exceptions import ConnectionError
@@ -79,24 +84,30 @@ class HealthCheckMiddleware(MiddlewareMixin):
             return False
 
     def queues_ok(self, request):
+        """
+        Check whether celery is alive by checking its stats.
+        """
         try:
-            from celery import shared_task
+            from celery import current_app
         except ImportError as e:
             logger.exception(e)
             return False
 
-        @shared_task(ignore_result=False)
-        def add(x, y):
-            return x + y
-
         try:
-            result = add.apply_async(args=[1, 1], expires=3,)
-            result.get(timeout=3)
-            if result.result != 2:
-                return False
-            return True
+            # Build a new app with shorter timeouts.
+            new_app = copy.deepcopy(current_app)
+            new_app.conf.CELERY_BROKER_CONNECTION_TIMEOUT= 1
+            new_app.conf.CELERY_BROKER_CONNECTION_MAX_RETRIES = 1
+            new_app.conf.CELERY_BROKER_TRANSPORT_OPTIONS = {
+                "max_retries": 1,
+                'interval_step': 0,
+                'interval_max': 0
+            }
+
+            i = new_app.control.inspect(timeout=1)
+            return bool(i.ping())
         except Exception as e:
             logger.exception(e)
             return False
-
-        return False
+        else:
+            return True

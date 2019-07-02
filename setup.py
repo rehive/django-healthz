@@ -3,7 +3,7 @@ from codecs import open
 from setuptools import find_packages, setup
 
 
-VERSION = '0.0.4'
+VERSION = '0.0.5'
 
 with open(os.path.join(os.path.dirname(__file__), 'README.md')) as readme:
     README = readme.read()
